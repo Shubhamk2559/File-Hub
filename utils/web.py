@@ -130,15 +130,33 @@ async def open_link(request: web.Request) -> web.StreamResponse:
 
 
 async def start_web_server(port: int, bot=None):
+    # /health is hit by Koyeb/Render health checks, the gateway pings and the Cloudflare Worker all day.
+    # Pinging MongoDB on EVERY call wastes a database round trip each time, so the answer is reused for a few seconds.
+    hc = {"t": 0.0, "err": None, "lock": asyncio.Lock()}
+
     async def health(request):
-        try:
-            await db.db.command("ping")
-            out = {"status": "ok", "streaming": streamer.ready}
-            if cluster.ENABLED:
-                out["node"] = config.NODE_ID
-            return web.json_response(out)
-        except Exception as e:
-            return web.json_response({"status": "db_error", "error": type(e).__name__}, status=503)
+        now = time.monotonic()
+        if config.HEALTH_CACHE_SEC and now - hc["t"] >= config.HEALTH_CACHE_SEC:
+            async with hc["lock"]:                              # many callers at once -> ONE ping
+                if time.monotonic() - hc["t"] >= config.HEALTH_CACHE_SEC:
+                    try:
+                        await db.db.command("ping")
+                        hc["err"] = None
+                    except Exception as e:
+                        hc["err"] = type(e).__name__
+                    hc["t"] = time.monotonic()
+        elif not config.HEALTH_CACHE_SEC:
+            try:
+                await db.db.command("ping")
+                hc["err"] = None
+            except Exception as e:
+                hc["err"] = type(e).__name__
+        if hc["err"]:
+            return web.json_response({"status": "db_error", "error": hc["err"]}, status=503)
+        out = {"status": "ok", "streaming": streamer.ready}
+        if cluster.ENABLED:
+            out["node"] = config.NODE_ID
+        return web.json_response(out, headers={"Cache-Control": "no-store"})
 
     async def root(request):
         return web.Response(text="OK")

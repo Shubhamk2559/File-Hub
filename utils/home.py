@@ -76,7 +76,7 @@ async def page(request: web.Request) -> web.Response:
     has_img = _image()[0] is not None
     img_tag = ('<div class="ringwrap"><div class="ring"><img src="/assets/home-image" alt="" width="420" height="420">'
                '</div></div>') if has_img else ""
-    og = (f'<meta property="og:image" content="{html.escape(config.BASE_URL, quote=True)}/assets/home-image">'
+    og = (f'<meta property="og:image" content="{html.escape(config.PUBLIC_URL or config.BASE_URL, quote=True)}/assets/home-image">'
           if has_img and config.BASE_URL else "")
     plane = ('<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#fff" '
              'd="M21.9 3.6 2.8 10.9c-1.3.5-1.3 1.3-.2 1.6l4.9 1.5 1.9 5.8c.2.6.1.8.7.8.4 0 .6-.2.9-.5l2.3-2.3 4.8 3.5'

@@ -438,8 +438,12 @@ async def connect_animation(bot, chat_id: int):
     if not ENABLED or chat_id not in _pending:
         return
     _pending.discard(chat_id)
-    if _is_admin(chat_id):
+    if _is_admin(chat_id) or config.CONNECT_ANIMATION in ("off", "0", "false", "no"):
         return
+    if config.CONNECT_ANIMATION == "auto":                 # busy server: 6 Telegram calls per user are better spent on the files
+        m = local_metrics()
+        if m["cpu"] >= 60 or m["ram"] >= 85 or live.tasks >= max(3, config.NODE_MAX_TASKS // 2):
+            return
     from telegram.constants import ParseMode
     frames = _frames()
     try:
