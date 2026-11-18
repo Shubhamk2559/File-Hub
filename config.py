@@ -79,3 +79,9 @@ SCALE_HEADROOM = min(3.0, max(1.0, float(os.getenv("SCALE_HEADROOM", "1.25") or 
 SCALE_TARGET_LOAD = min(0.95, max(0.30, float(os.getenv("SCALE_TARGET_LOAD", "0.70") or 0.70)))    # servers should stay below this load
 SCALE_MIN_SERVERS = max(1, int(os.getenv("SCALE_MIN_SERVERS", "2") or 2))                          # never suggest going below this
 SCALE_MAX_SERVERS = max(0, int(os.getenv("SCALE_MAX_SERVERS", "0") or 0))                          # 0 = no upper limit in the advice
+
+# Speed / load tuning (all optional)
+MONGO_MAX_POOL = max(5, int(os.getenv("MONGO_MAX_POOL", "25") or 25))      # MongoDB connections per server (Atlas free M0 allows 500 in total)
+HEALTH_CACHE_SEC = max(0, int(os.getenv("HEALTH_CACHE_SEC", "5") or 5))     # /health re-checks MongoDB at most this often
+# "Connecting..." animation = 1 send + 4 edits + 1 delete per user. auto = skipped while the server is busy, on / off = always / never
+CONNECT_ANIMATION = os.getenv("CONNECT_ANIMATION", "auto").strip().lower()

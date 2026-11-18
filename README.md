@@ -60,6 +60,9 @@ All servers share the same MongoDB.
 | `NODE_ROLE` | `gateway` | `worker` |
 | `BASE_URL` | its own `https://...koyeb.app` | its own `https://...koyeb.app` |
 | `NODE_CAPACITY` (optional) | users per server, default 30 | same |
+| `MONGO_MAX_POOL` (optional) | MongoDB connections per server, default 25 | all |
+| `HEALTH_CACHE_SEC` (optional) | /health asks MongoDB at most this often, default 5 | all |
+| `CONNECT_ANIMATION` (optional) | `auto` (default, skipped when busy) / `on` / `off` | all |
 | `SCALE_ALERTS` (optional) | `1` (default): the bot messages the owner when load rises and says how many servers to add. `0` = off | gateway |
 | `SCALE_HEADROOM` / `SCALE_TARGET_LOAD` / `SCALE_MIN_SERVERS` / `SCALE_MAX_SERVERS` (optional) | tune the advice: spare room (1.25), target load (0.70), minimum (2), upper limit (0 = none) | gateway |
 
