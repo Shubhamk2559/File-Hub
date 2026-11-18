@@ -32,3 +32,6 @@ Rules: exactly one NODE_ROLE=gateway, unique NODE_ID on every server (see ../FIX
 Notes: DL_MODE=proxy sends video bytes through Cloudflare (user only sees hubpa.com). If you ever see Cloudflare
 limits/complaints, set DL_MODE=redirect: share links stay on hubpa.com, only the Stream/Download request jumps to a server URL.
 Old links created before this change keep their old address.
+
+## Optional: CACHE_LINKS
+Variable `CACHE_LINKS=30` caches the t.me redirect of file links at Cloudflare for 30 seconds, so a popular link reaches your servers once per 30 s. `/` and `/assets/*` are always cached (5 min / 1 h). A revoked link keeps working for at most that many seconds. Leave it unset to turn it off.
